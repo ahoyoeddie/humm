@@ -37,6 +37,7 @@
             background-size: 40px 40px;
             opacity: 0.15;
             z-index: 0;
+            pointer-events: none;
         }
 
         .container {
@@ -52,7 +53,7 @@
             border: 1px solid white;
         }
 
-        h1 { color: var(--primary); font-size: 2rem; margin-bottom: 1.5rem; }
+        h1 { color: var(--primary); font-size: 1.8rem; margin-bottom: 1.5rem; font-family: 'Poppins', sans-serif; }
 
         .btns {
             display: flex;
@@ -73,8 +74,8 @@
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        #yesBtn { background: var(--primary); color: white; z-index: 100; }
-        #noBtn { background: #adb5bd; color: white; position: relative; }
+        #yesBtn { background: var(--primary); color: white; z-index: 100; position: relative; }
+        #noBtn { background: #adb5bd; color: white; position: relative; z-index: 90; }
 
         #letterContent {
             display: none;
@@ -100,6 +101,23 @@
             color: var(--primary);
         }
 
+        #musicToggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            background: white;
+            border: 1px solid var(--primary);
+            border-radius: 50%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
         .cursor { display: inline-block; width: 8px; background: var(--primary); animation: blink 0.7s infinite; margin-left: 2px; }
         @keyframes blink { 50% { opacity: 0; } }
 
@@ -118,6 +136,9 @@
 </head>
 <body>
     <div id="bg-pattern"></div>
+
+    <audio id="myAudio" src="musique.mp3" loop></audio>
+    <div id="musicToggle" onclick="toggleMusic()">🎵</div>
 
     <div class="container" id="mainBox">
         <div id="ui-question">
@@ -142,24 +163,39 @@
         const letterContent = document.getElementById('letterContent');
         const textTarget = document.getElementById('textTarget');
         const sigTarget = document.getElementById('sigTarget');
+        const audio = document.getElementById('myAudio');
+        const musicToggle = document.getElementById('musicToggle');
         
         let yesScale = 1;
 
-        noBtn.addEventListener('mouseover', moveButton);
-        noBtn.addEventListener('click', moveButton);
-
+        // Fonction pour déplacer le bouton Non
         function moveButton() {
-            const x = Math.random() * (window.innerWidth - noBtn.clientWidth);
-            const y = Math.random() * (window.innerHeight - noBtn.clientHeight);
+            const maxX = window.innerWidth - noBtn.clientWidth;
+            const maxY = window.innerHeight - noBtn.clientHeight;
+            const x = Math.random() * maxX;
+            const y = Math.random() * maxY;
+            
             noBtn.style.position = 'fixed';
             noBtn.style.left = x + 'px';
             noBtn.style.top = y + 'px';
 
-            yesScale += 0.35;
+            yesScale += 0.2; // Augmente la taille du bouton Oui
             yesBtn.style.transform = `scale(${yesScale})`;
         }
 
-        // Ton nouveau texte personnalisé pour Norah
+        noBtn.addEventListener('mouseover', moveButton);
+        noBtn.addEventListener('click', moveButton);
+
+        function toggleMusic() {
+            if (audio.paused) {
+                audio.play();
+                musicToggle.innerText = "🎵";
+            } else {
+                audio.pause();
+                musicToggle.innerText = "🔇";
+            }
+        }
+
         const bodyText = "Marusca, j’aime la douceur de nos échanges et la place que tu prends, petit à petit, dans ma vie. Tout se fait naturellement entre nous, et ça me plaît. Pour cette Saint-Valentin, je voulais simplement te dire que je suis bien avec toi, que j’aime ce qu’on partage, et que j’ai envie de continuer à avancer tranquillement, ensemble.";
         const footerText = "Avec tout mon amour,\nEddie";
 
@@ -167,6 +203,10 @@
             uiQuestion.style.display = 'none';
             noBtn.style.display = 'none';
             letterContent.style.display = 'block';
+            musicToggle.style.display = 'flex';
+            
+            // Démarrage audio
+            audio.play().catch(e => console.log("Audio play blocked"));
             
             typeWriter(bodyText, textTarget, 40, () => {
                 setTimeout(() => {
@@ -197,14 +237,15 @@
             heart.className = 'heart';
             heart.style.left = Math.random() * 100 + 'vw';
             heart.style.top = '100vh';
-            heart.style.fontSize = Math.random() * 20 + 15 + 'px';
+            heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
             document.body.appendChild(heart);
             setTimeout(() => heart.remove(), 4000);
         }
 
+        // Effet parallaxe léger
         document.addEventListener('mousemove', (e) => {
-            const x = (e.clientX - window.innerWidth / 2) * 0.02;
-            const y = (e.clientY - window.innerHeight / 2) * 0.02;
+            const x = (e.clientX - window.innerWidth / 2) * 0.01;
+            const y = (e.clientY - window.innerHeight / 2) * 0.01;
             document.getElementById('bg-pattern').style.transform = `translate(${x}px, ${y}px)`;
         });
     </script>
